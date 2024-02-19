@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Калькулятор бандла курсов</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Калькулятор бандла курсов</h1>
+      <form id="bundleForm">
+        <div class="course-selection">
+          <!-- Список курсов для выбора -->
+          <fieldset>
+            <legend>Architecture</legend>
+            <label>
+              <input
+                type="radio"
+                name="Architecture"
+                value="ArchitectureVanilla"
+              />
+              Architecture Vanilla </label
+            ><br />
+            <label>
+              <input
+                type="radio"
+                name="Architecture"
+                value="ArchitectureStandart"
+              />
+              Architecture Standart
+            </label>
+          </fieldset>
+
+          <!-- Группа для ECS -->
+          <fieldset>
+            <legend>ECS</legend>
+            <label>
+              <input type="radio" name="ECS" value="ECSVanilla" />
+              ECS Vanilla </label
+            ><br />
+            <label>
+              <input type="radio" name="ECS" value="ECSStandart" />
+              ECS Standart
+            </label>
+          </fieldset>
+          <label
+            ><input type="checkbox" name="courses" value="TeamLead" /> Team
+            Lead</label
+          ><br />
+          <label
+            ><input type="checkbox" name="courses" value="UnitTesting" /> Unit
+            testing</label
+          ><br />
+          <label><input type="checkbox" name="courses" value="AI" /> AI</label
+          ><br />
+          <label
+            ><input type="checkbox" name="courses" value="Addressables" />
+            Addressables</label
+          ><br />
+        </div>
+        <button type="button" id="buyBundle">Купить</button>
+      </form>
+      <div id="savings"></div>
+
+      <div id="totalPrice"></div>
+    </div>
+
+    <script src="js/bundleScript.js"></script>
+  </body>
+</html>
