@@ -12,6 +12,30 @@ const totalPriceContainer = {
 
 let chosen = [];
 
+(() => {
+  try {
+    const data = JSON.parse(localStorage.getItem('formData')) || {};
+    if (data.isBlackFriday !== IS_BLACK_FRIDAY)
+      localStorage.removeItem('formData');
+    else {
+      chosen = data.chosen;
+
+      form.querySelectorAll('input').forEach((item) => {
+        const courseNames = data.chosen.map((item) => item.name);
+
+        if (courseNames.includes(item.value)) item.checked = true;
+
+        updateUI({
+          originalTotalPrice: data.originalTotalPrice,
+          totalPrice: data.totalPrice,
+        });
+      });
+    }
+  } catch (error) {
+    throw new Error(error);
+  }
+})();
+
 const discounts = {
   primary: 0.4,
   secondary: 0.5,
@@ -57,7 +81,6 @@ function onFormChangeIsNotBlackFriday(e) {
     chosen = chosen.filter((item) => item.name !== e.target.value);
   else {
     chosen = findRemovedCourse(chosen);
-    console.log(chosen);
     chosen.push({ ...course });
   }
 
@@ -321,7 +344,6 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
 }
 
 function updateUI({ originalTotalPrice, totalPrice }) {
-  // console.log(originalTotalPrice, totalPrice);
   if (!originalTotalPrice && isNaN(totalPrice)) {
     totalPriceRef.classList.add('hidden');
     return;
@@ -333,4 +355,15 @@ function updateUI({ originalTotalPrice, totalPrice }) {
   totalPriceContainer.savings.innerHTML = (
     originalTotalPrice - totalPrice
   )?.toFixed(2);
+
+  localStorage.setItem(
+    'formData',
+    JSON.stringify({
+      originalTotalPrice,
+      totalPrice,
+      savings: originalTotalPrice - totalPrice,
+      chosen,
+      isBlackFriday: IS_BLACK_FRIDAY,
+    })
+  );
 }
