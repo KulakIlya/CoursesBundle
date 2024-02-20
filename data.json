@@ -1,0 +1,50 @@
+[
+  {
+    "name": "ArchitectureVanilla",
+    "originalPrice": 580,
+    "normalDiscount": 0.13,
+    "isFlagship": true
+  },
+  {
+    "name": "ArchitectureStandart",
+    "originalPrice": 950,
+    "normalDiscount": 0.13,
+    "isFlagship": true
+  },
+  {
+    "name": "ECSVanilla",
+    "originalPrice": 600,
+    "normalDiscount": 0.07,
+    "isFlagship": true
+  },
+  {
+    "name": "ECSStandart",
+    "originalPrice": 960,
+    "normalDiscount": 0.07,
+    "isFlagship": true
+  },
+  {
+    "name": "TeamLead",
+    "originalPrice": 299,
+    "normalDiscount": 0.13,
+    "isFlagship": false
+  },
+  {
+    "name": "UnitTesting",
+    "originalPrice": 550,
+    "normalDiscount": 0.13,
+    "isFlagship": false
+  },
+  {
+    "name": "AI",
+    "originalPrice": 250,
+    "normalDiscount": 0.32,
+    "isFlagship": false
+  },
+  {
+    "name": "Addressables",
+    "originalPrice": 250,
+    "normalDiscount": 0,
+    "isFlagship": false
+  }
+]

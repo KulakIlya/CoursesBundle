@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Калькулятор бандла курсов</title>
     <link rel="stylesheet" href="css/style.css" />
+    <!-- <script src="js/bundleScript.js" defer></script> -->
+    <script src="js/index.js" type="module" defer></script>
   </head>
   <body>
     <div class="container">
@@ -59,13 +61,21 @@
             Addressables</label
           ><br />
         </div>
-        <button type="button" id="buyBundle">Купить</button>
+        <button type="submit" id="buyBundle">Купить</button>
       </form>
-      <div id="savings"></div>
 
-      <div id="totalPrice"></div>
+      <div id="totalPrice" class="hidden">
+        <p>
+          Итоговая цена выбранных курсов:
+          <s id="originalPrice"></s>
+          <span id="currentPrice"></span> USD.
+        </p>
+        <p>
+          Ваша экономия:
+          <span id="savings"></span>
+          USD.
+        </p>
+      </div>
     </div>
-
-    <script src="js/bundleScript.js"></script>
   </body>
 </html>
