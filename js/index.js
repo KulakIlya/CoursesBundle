@@ -24,6 +24,8 @@ function onFormChange(e) {
   if (!e.target.checked) {
     chosen = chosen.filter((item) => item.name !== e.target.value);
   } else {
+    chosen = findRemovedCourse(chosen);
+    console.log(chosen);
     chosen.push({ ...course });
   }
 
@@ -104,6 +106,17 @@ function findUnitTest(chosen) {
 
 function findAddressables(chosen) {
   return chosen.find((item) => item.name === 'Addressables');
+}
+
+// if radio button is unselected, removes it from chosen array
+function findRemovedCourse(chosen) {
+  const allRadioButtons = document.querySelectorAll('input[type="radio"]');
+
+  const notCheckedCourses = [...allRadioButtons]
+    .filter((item) => !item.checked)
+    .map((item) => item.value);
+
+  return chosen.filter((item) => !notCheckedCourses.includes(item.name));
 }
 
 // Returns prioritized course name and discount for second course
