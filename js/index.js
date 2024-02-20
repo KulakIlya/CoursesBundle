@@ -2,7 +2,15 @@ import courses from '../data.json' assert { type: 'json' };
 
 const IS_BLACK_FRIDAY = true;
 
+let PROMO = {
+  code: 'abc',
+  discount: 0.5,
+  used: false,
+};
+
 const form = document.querySelector('#bundleForm');
+const promoInput = form.elements.promo;
+
 const totalPriceRef = document.querySelector('#totalPrice');
 const totalPriceContainer = {
   originalPrice: document.querySelector('#originalPrice'),
@@ -11,6 +19,8 @@ const totalPriceContainer = {
 };
 
 let chosen = [];
+let totalPrice = { originalTotalPrice: 0, currentTotalPrice: 0 };
+let tempPrice = { originalTotalPrice: 0, currentTotalPrice: 0 };
 
 (() => {
   try {
@@ -25,10 +35,11 @@ let chosen = [];
 
         if (courseNames.includes(item.value)) item.checked = true;
 
-        updateUI({
+        totalPrice = {
           originalTotalPrice: data.originalTotalPrice,
-          totalPrice: data.totalPrice,
-        });
+          currentTotalPrice: data.currentTotalPrice,
+        };
+        updateUI(totalPrice);
       });
     }
   } catch (error) {
@@ -56,6 +67,19 @@ form.addEventListener(
 );
 
 form.addEventListener('click', onClearBtnClick);
+
+promoInput.addEventListener('input', (e) => {
+  if (promoInput.value !== PROMO.code) return;
+
+  tempPrice = {
+    ...totalPrice,
+    currentTotalPrice:
+      totalPrice.currentTotalPrice -
+      totalPrice.currentTotalPrice * PROMO.discount,
+  };
+
+  updateUI(tempPrice);
+});
 
 function onClearBtnClick(e) {
   const closest = e.target.closest('.btn-clear');
@@ -105,12 +129,13 @@ function onFormChangeIsNotBlackFriday(e) {
         return {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
-          totalPrice: acc.totalPrice + itemTotalPrice,
+          currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
         };
       },
-      { originalTotalPrice: 0, totalPrice: 0 }
+      { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
-    updateUI(config);
+    totalPrice = config;
+    updateUI(totalPrice);
     return;
   }
 
@@ -127,24 +152,25 @@ function onFormChangeIsNotBlackFriday(e) {
         return {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
-          totalPrice: acc.totalPrice + itemTotalPrice,
+          currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
         };
       },
       {
         originalTotalPrice: 0,
-        totalPrice: 0,
+        currentTotalPrice: 0,
       }
     );
-    updateUI(config);
+    totalPrice = config;
+    updateUI(totalPrice);
     return;
   }
-
-  updateUI({
+  totalPrice = {
     originalTotalPrice: chosen[0]?.originalPrice,
-    totalPrice:
+    currentTotalPrice:
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
-  });
+  };
+  updateUI(totalPrice);
 }
 
 function onFormChangeIsBlackFriday(e) {
@@ -178,12 +204,13 @@ function onFormChangeIsBlackFriday(e) {
         return {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
-          totalPrice: acc.totalPrice + itemTotalPrice,
+          currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
         };
       },
-      { originalTotalPrice: 0, totalPrice: 0 }
+      { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
-    updateUI(config);
+    totalPrice = config;
+    updateUI(totalPrice);
     return;
   }
 
@@ -196,24 +223,25 @@ function onFormChangeIsBlackFriday(e) {
         return {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
-          totalPrice: acc.totalPrice + itemTotalPrice,
+          currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
         };
       },
       {
         originalTotalPrice: 0,
-        totalPrice: 0,
+        currentTotalPrice: 0,
       }
     );
-    updateUI(config);
+    totalPrice = config;
+    updateUI(totalPrice);
     return;
   }
-
-  updateUI({
+  totalPrice = {
     originalTotalPrice: chosen[0]?.originalPrice,
-    totalPrice:
+    currentTotalPrice:
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
-  });
+  };
+  updateUI(totalPrice);
 }
 
 function includesArchitectureVanilla(chosen) {
@@ -343,27 +371,28 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
   }
 }
 
-function updateUI({ originalTotalPrice, totalPrice }) {
-  if (!originalTotalPrice && isNaN(totalPrice)) {
+function updateUI({ originalTotalPrice, currentTotalPrice }) {
+  if (!originalTotalPrice && isNaN(currentTotalPrice)) {
     totalPriceRef.classList.add('hidden');
     return;
   }
   totalPriceRef.classList.remove('hidden');
 
   totalPriceContainer.originalPrice.innerHTML = originalTotalPrice?.toFixed(2);
-  totalPriceContainer.currentPrice.innerHTML = totalPrice?.toFixed(2);
+  totalPriceContainer.currentPrice.innerHTML = currentTotalPrice?.toFixed(2);
   totalPriceContainer.savings.innerHTML = (
-    originalTotalPrice - totalPrice
+    originalTotalPrice - currentTotalPrice
   )?.toFixed(2);
 
   localStorage.setItem(
     'formData',
     JSON.stringify({
-      originalTotalPrice,
-      totalPrice,
+      ...totalPrice,
       savings: originalTotalPrice - totalPrice,
       chosen,
       isBlackFriday: IS_BLACK_FRIDAY,
+      // promoCode: promoInput.value,
     })
   );
 }
+1;
