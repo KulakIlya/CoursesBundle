@@ -41,3 +41,25 @@ input[name='promo'] {
 #buyBundle {
   margin-top: 10px;
 }
+
+#originalPrice,
+#currentPrice,
+#savings {
+  display: inline-block;
+}
+
+.price-changed {
+  animation: priceAnimation 1s ease-in-out;
+}
+
+@keyframes priceAnimation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

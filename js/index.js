@@ -1,11 +1,12 @@
 import courses from '../data.json' assert { type: 'json' };
 
-const IS_BLACK_FRIDAY = true;
+const IS_BLACK_FRIDAY = false;
 
 let PROMO = {
   code: 'abc',
   discount: 0.5,
-  used: false,
+  inUse: false,
+  isUsed: false,
 };
 
 const form = document.querySelector('#bundleForm');
@@ -39,6 +40,15 @@ let tempPrice = { originalTotalPrice: 0, currentTotalPrice: 0 };
           originalTotalPrice: data.originalTotalPrice,
           currentTotalPrice: data.currentTotalPrice,
         };
+
+        // console.log(totalPrice);
+        PROMO.inUse = data.promoInUse;
+        PROMO.isUsed = data.promoCodeIsUsed;
+        promoInput.value = data.promoCode;
+
+        const event = new Event('input');
+        promoInput.dispatchEvent(event);
+
         updateUI(totalPrice);
       });
     }
@@ -69,16 +79,20 @@ form.addEventListener(
 form.addEventListener('click', onClearBtnClick);
 
 promoInput.addEventListener('input', (e) => {
-  if (promoInput.value !== PROMO.code) return;
+  console.log(PROMO);
+  if (promoInput.value !== PROMO.code || PROMO.inUse) return;
 
-  tempPrice = {
+  PROMO.inUse = true;
+
+  totalPrice = {
     ...totalPrice,
     currentTotalPrice:
       totalPrice.currentTotalPrice -
       totalPrice.currentTotalPrice * PROMO.discount,
   };
 
-  updateUI(tempPrice);
+  PROMO.isUsed = true;
+  updateUI(totalPrice, false);
 });
 
 function onClearBtnClick(e) {
@@ -99,6 +113,8 @@ function onClearBtnClick(e) {
 }
 
 function onFormChangeIsNotBlackFriday(e) {
+  if (e.target.name === 'promo') return;
+
   const course = courses.find(({ name }) => name === e.target.value);
 
   if (!e.target.checked)
@@ -126,16 +142,20 @@ function onFormChangeIsNotBlackFriday(e) {
         const itemTotalPrice =
           item.originalPrice - item.originalPrice * itemDiscount;
 
+        console.log(item, itemDiscount, itemTotalPrice);
+
         return {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
+          // - (acc.currentTotalPrice + itemTotalPrice) *
+          //   (PROMO.inUse ? PROMO.discount : 0),
         };
       },
       { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
     totalPrice = config;
-    updateUI(totalPrice);
+    updateUI(totalPrice, true);
     return;
   }
 
@@ -153,6 +173,8 @@ function onFormChangeIsNotBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
+          // - (acc.currentTotalPrice + itemTotalPrice) *
+          //   (PROMO.inUse ? PROMO.discount : 0),
         };
       },
       {
@@ -161,7 +183,7 @@ function onFormChangeIsNotBlackFriday(e) {
       }
     );
     totalPrice = config;
-    updateUI(totalPrice);
+    updateUI(totalPrice, true);
     return;
   }
   totalPrice = {
@@ -170,10 +192,12 @@ function onFormChangeIsNotBlackFriday(e) {
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
   };
-  updateUI(totalPrice);
+  updateUI(totalPrice, true);
 }
 
 function onFormChangeIsBlackFriday(e) {
+  if (e.target.name === 'promo') return;
+
   const course = courses.find(({ name }) => name === e.target.value);
 
   if (!e.target.checked)
@@ -184,6 +208,7 @@ function onFormChangeIsBlackFriday(e) {
   }
 
   if (chosen.length === 2) {
+    console.log(getCourseNameAndBlackFridayDiscount(chosen));
     const { courseName, firstCourseDiscount, secondCourseDiscount } =
       getCourseNameAndBlackFridayDiscount(chosen);
 
@@ -205,6 +230,8 @@ function onFormChangeIsBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
+          // - (acc.currentTotalPrice + itemTotalPrice) *
+          //   (PROMO.inUse && !PROMO.used ? PROMO.discount : 0),
         };
       },
       { originalTotalPrice: 0, currentTotalPrice: 0 }
@@ -224,6 +251,8 @@ function onFormChangeIsBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
+          //  - (acc.currentTotalPrice + itemTotalPrice) *
+          //     (PROMO.inUse & !PROMO.isUsed ? PROMO.discount : 0),
         };
       },
       {
@@ -240,6 +269,9 @@ function onFormChangeIsBlackFriday(e) {
     currentTotalPrice:
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
+    // - (chosen[0]?.originalPrice -
+    //   chosen[0]?.originalPrice * chosen[0]?.normalDiscount) *
+    //   (PROMO.inUse & !PROMO.isUsed ? PROMO.discount : 0),
   };
   updateUI(totalPrice);
 }
@@ -369,9 +401,23 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
       secondCourseDiscount: primary,
     };
   }
+  return {
+    courseName: '',
+    firstCourseDiscount: primary,
+    secondCourseDiscount: primary,
+  };
 }
 
-function updateUI({ originalTotalPrice, currentTotalPrice }) {
+function updateUI(
+  { originalTotalPrice, currentTotalPrice },
+  formHasChanged = false
+) {
+  currentTotalPrice =
+    currentTotalPrice -
+    currentTotalPrice * (PROMO.inUse && formHasChanged ? PROMO.discount : 0);
+  // console.log(currentTotalPrice, PROMO.inUse);
+  // console.log(totalPrice);
+  deployPriceChangeAnimation();
   if (!originalTotalPrice && isNaN(currentTotalPrice)) {
     totalPriceRef.classList.add('hidden');
     return;
@@ -384,15 +430,38 @@ function updateUI({ originalTotalPrice, currentTotalPrice }) {
     originalTotalPrice - currentTotalPrice
   )?.toFixed(2);
 
+  // console.log({
+  //   ...totalPrice,
+  //   currentTotalPrice,
+  //   savings: originalTotalPrice - currentTotalPrice,
+  //   chosen,
+  //   isBlackFriday: IS_BLACK_FRIDAY,
+  //   promoCode: promoInput.value,
+  //   promoCodeIsUsed: PROMO.isUsed,
+  //   promoInUse: PROMO.inUse,
+  // });
   localStorage.setItem(
     'formData',
     JSON.stringify({
       ...totalPrice,
-      savings: originalTotalPrice - totalPrice,
+      currentTotalPrice,
       chosen,
       isBlackFriday: IS_BLACK_FRIDAY,
-      // promoCode: promoInput.value,
+      promoCode: promoInput.value,
+      promoCodeIsUsed: PROMO.isUsed,
+      promoInUse: PROMO.inUse,
     })
   );
 }
-1;
+
+function deployPriceChangeAnimation() {
+  totalPriceContainer.originalPrice.classList.add('price-changed');
+  totalPriceContainer.currentPrice.classList.add('price-changed');
+  totalPriceContainer.savings.classList.add('price-changed');
+
+  setTimeout(() => {
+    totalPriceContainer.originalPrice.classList.remove('price-changed');
+    totalPriceContainer.currentPrice.classList.remove('price-changed');
+    totalPriceContainer.savings.classList.remove('price-changed');
+  }, 1000);
+}
