@@ -79,7 +79,6 @@ form.addEventListener(
 form.addEventListener('click', onClearBtnClick);
 
 promoInput.addEventListener('input', (e) => {
-  console.log(PROMO);
   if (promoInput.value !== PROMO.code || PROMO.inUse) return;
 
   PROMO.inUse = true;
@@ -141,8 +140,6 @@ function onFormChangeIsNotBlackFriday(e) {
 
         const itemTotalPrice =
           item.originalPrice - item.originalPrice * itemDiscount;
-
-        console.log(item, itemDiscount, itemTotalPrice);
 
         return {
           ...acc,
