@@ -1,88 +1,185 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Калькулятор бандла курсов</title>
-    <link rel="stylesheet" href="css/style.css" />
-    <!-- <script src="js/bundleScript.js" defer></script> -->
-    <script src="js/index.js" type="module" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/2.0.0/modern-normalize.min.css"
+      integrity="sha512-4xo8blKMVCiXpTaLzQSLSw3KFOVPWhm/TRtuPVc4WG6kUgjH6J03IBuG7JZPkcWMxJ5huwaBpOpnwYElP/m6wg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./css/style.css" />
+    <script src="./js/index.js" type="module" defer></script>
   </head>
   <body>
-    <div class="container">
-      <h1>Калькулятор бандла курсов</h1>
-      <form id="bundleForm">
-        <div class="course-selection">
-          <!-- Список курсов для выбора -->
+    <div class="overlay">
+      <div class="modal">
+        <form class="modal-form" id="course-form">
           <fieldset>
             <legend>Architecture</legend>
-            <label>
-              <input
-                type="radio"
-                name="Architecture"
-                value="ArchitectureVanilla"
-              />
-              Architecture Vanilla </label
-            ><br />
-            <label>
-              <input
-                type="radio"
-                name="Architecture"
-                value="ArchitectureStandart"
-              />
-              Architecture Standart
-            </label>
-            <button class="btn-clear" data-name="Architecture" type="button">
-              Очистить
-            </button>
+            <div>
+              <label class="form-label">
+                <input
+                  class="form-input check-input"
+                  type="radio"
+                  name="Architecture"
+                  value="Architecture Vanilla"
+                  data-name="Architecture Vanilla"
+                />
+                <span class="checkbox"></span>
+                Architecture Vanilla
+              </label>
+              <label class="form-label">
+                <input
+                  class="form-input check-input"
+                  type="radio"
+                  name="Architecture"
+                  value="Architecture Standart"
+                  data-name="Architecture Standart"
+                />
+                <span class="checkbox"></span>
+                Architecture Standart
+              </label>
+              <button
+                class="btn-clear btn-primary"
+                data-name="Architecture"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
           </fieldset>
 
-          <!-- Группа для ECS -->
           <fieldset>
             <legend>ECS</legend>
-            <label>
-              <input type="radio" name="ECS" value="ECSVanilla" />
-              ECS Vanilla </label
-            ><br />
-            <label>
-              <input type="radio" name="ECS" value="ECSStandart" />
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="radio"
+                name="ECS"
+                value="ECS Vanilla"
+                data-name="ESC Vanilla"
+              />
+              <span class="checkbox"></span>
+              ECS Vanilla
+            </label>
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="radio"
+                name="ECS"
+                value="ECS Standart"
+                data-name="ECS Standart"
+              />
+              <span class="checkbox"></span>
               ECS Standart
             </label>
-            <button class="btn-clear" data-name="ECS" type="button">
-              Очистить
+            <button class="btn-clear btn-primary" data-name="ECS" type="button">
+              Clear
             </button>
           </fieldset>
-          <label
-            ><input type="checkbox" name="courses" value="TeamLead" /> Team
-            Lead</label
-          ><br />
-          <label
-            ><input type="checkbox" name="courses" value="UnitTesting" /> Unit
-            testing</label
-          ><br />
-          <label><input type="checkbox" name="courses" value="AI" /> AI</label
-          ><br />
-          <label
-            ><input type="checkbox" name="courses" value="Addressables" />
-            Addressables</label
-          ><br />
-        </div>
-        <input type="text" name="promo" placeholder="Введите промокод" />
-        <br />
-        <button type="submit" id="buyBundle">Купить</button>
-      </form>
+          <div class="checkbox-fields">
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="checkbox"
+                name="TeamLead"
+                value="TeamLead"
+                data-name="TeamLead"
+              />
+              <span class="checkbox"
+                ><svg class="icon-checkbox" width="16" height="11">
+                  <use href="./images/icons.svg#icon-check"></use>
+                </svg>
+              </span>
+              Team Lead</label
+            >
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="checkbox"
+                name="Unit Testing"
+                value="Unit Testing"
+                data-name="Unit Testing"
+              />
+              <span class="checkbox">
+                <svg class="icon-checkbox" width="16" height="11">
+                  <use href="./images/icons.svg#icon-check"></use>
+                </svg>
+              </span>
+              Unit testing</label
+            >
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="checkbox"
+                name="AI"
+                value="AI"
+                data-name="AI"
+              />
+              <span class="checkbox">
+                <svg class="icon-checkbox" width="16" height="11">
+                  <use href="./images/icons.svg#icon-check"></use>
+                </svg>
+              </span>
+              AI</label
+            >
+            <label class="form-label">
+              <input
+                class="form-input check-input"
+                type="checkbox"
+                name="Addressables"
+                value="Addressables"
+                data-name="Addressables"
+              />
+              <span class="checkbox"
+                ><svg class="icon-checkbox" width="16" height="11">
+                  <use href="./images/icons.svg#icon-check"></use>
+                </svg>
+              </span>
+              Addressables</label
+            >
+          </div>
 
-      <div id="totalPrice" class="hidden">
-        <p>
-          Итоговая цена выбранных курсов:
-          <s id="originalPrice"></s>
-          <span id="currentPrice"></span> USD.
-        </p>
-        <p>
-          Ваша экономия:
-          <span id="savings"></span>
-          USD.
-        </p>
+          <input
+            class="form-input promo-input"
+            type="text"
+            name="promo"
+            placeholder="Введите промокод"
+          />
+        </form>
+        <div class="results">
+          <div>
+            <h2 class="modal-title">Калькулятор бандлов</h2>
+            <ul class="chosen-list"></ul>
+          </div>
+          <p class="cta">Выберите что-нибудь из каталога</p>
+          <div class="total-price hidden">
+            <p>
+              Ваша экономия:
+              <span class="accent" id="savings"></span> USD.
+            </p>
+            <p>
+              Итоговая цена выбранных курсов: <br />
+              <s id="original-price"></s>
+              <span class="accent" id="current-price"></span> USD.
+            </p>
+          </div>
+          <div class="btn-wrapper">
+            <a href="#" class="btn-contact-us">
+              Задать вопрос
+              <svg class="icon-contact-us" width="32" height="32">
+                <use href="./images/icons.svg#icon-telegram"></use>
+              </svg>
+            </a>
+            <button form="course-form" type="submit" class="btn-primary">
+              Оплатить
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </body>

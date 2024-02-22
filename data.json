@@ -1,27 +1,27 @@
 [
   {
-    "name": "ArchitectureVanilla",
+    "name": "Architecture Vanilla",
     "originalPrice": 580,
     "normalDiscount": 0.13,
     "blackFridayDiscount": 0.5,
     "isFlagship": true
   },
   {
-    "name": "ArchitectureStandart",
+    "name": "Architecture Standart",
     "originalPrice": 950,
-    "normalDiscount": 0.3,
+    "normalDiscount": 0.13,
     "blackFridayDiscount": 0.3,
     "isFlagship": true
   },
   {
-    "name": "ECSVanilla",
+    "name": "ECS Vanilla",
     "originalPrice": 600,
     "normalDiscount": 0.07,
     "blackFridayDiscount": 0.07,
     "isFlagship": true
   },
   {
-    "name": "ECSStandart",
+    "name": "ECS Standart",
     "originalPrice": 960,
     "normalDiscount": 0.07,
     "blackFridayDiscount": 0.07,
@@ -35,7 +35,7 @@
     "isFlagship": false
   },
   {
-    "name": "UnitTesting",
+    "name": "Unit Testing",
     "originalPrice": 550,
     "normalDiscount": 0.13,
     "blackFridayDiscount": 0.5,
