@@ -92,6 +92,7 @@ promoInput.addEventListener('input', (e) => {
       currentTotalPrice: totalPrice.currentTotalPrice / PROMO.discount,
     };
     PROMO.inUse = PROMO.isUsed = false;
+
     updateUI(totalPrice, false);
     return;
   }
@@ -439,11 +440,12 @@ function updateUI(
   currentTotalPrice =
     currentTotalPrice -
     currentTotalPrice * (PROMO.inUse && formHasChanged ? PROMO.discount : 0);
+  console.log(currentTotalPrice, PROMO.inUse);
 
   deployPriceChangeAnimation();
 
   // if no courses were selected
-  if (!originalTotalPrice && isNaN(currentTotalPrice)) {
+  if (!originalTotalPrice && (isNaN(currentTotalPrice) || !currentTotalPrice)) {
     totalPriceRef.classList.add('hidden');
     totalPriceContainer.cta.classList.remove('hidden');
     return;
@@ -457,18 +459,17 @@ function updateUI(
     originalTotalPrice - currentTotalPrice
   )?.toFixed(2);
 
-  localStorage.setItem(
-    'formData',
-    JSON.stringify({
-      ...totalPrice,
-      currentTotalPrice,
-      chosen,
-      isBlackFriday: IS_BLACK_FRIDAY,
-      promoCode: promoInput.value,
-      promoCodeIsUsed: PROMO.isUsed,
-      promoInUse: PROMO.inUse,
-    })
-  );
+  totalPrice = {
+    ...totalPrice,
+    currentTotalPrice,
+    chosen,
+    isBlackFriday: IS_BLACK_FRIDAY,
+    promoCode: promoInput.value,
+    promoCodeIsUsed: PROMO.isUsed,
+    promoInUse: PROMO.inUse,
+  };
+
+  localStorage.setItem('formData', JSON.stringify(totalPrice));
 }
 
 function deployPriceChangeAnimation() {
