@@ -6,7 +6,6 @@ let PROMO = {
   code: 'abc',
   discount: 0.5,
   inUse: false,
-  isUsed: false,
 };
 
 const modal = document.querySelector('.modal');
@@ -31,6 +30,20 @@ let totalPrice = {
   currentPriceWithPromo: 0,
 };
 
+const discounts = {
+  primary: 0.4,
+  secondary: 0.5,
+  tertiary: 0.3,
+};
+
+const blackFridayDiscounts = {
+  primary: 0.5,
+  secondary: 0.4,
+  tertiary: 0.3,
+  quaternary: 0.63,
+  pentagonal: 0.7,
+};
+
 (() => {
   try {
     const data = JSON.parse(localStorage.getItem('formData')) || {};
@@ -50,33 +63,18 @@ let totalPrice = {
         };
 
         PROMO.inUse = data.promoInUse;
-        PROMO.isUsed = data.promoCodeIsUsed;
         promoInput.value = data.promoCode;
 
         const event = new Event('input');
         promoInput.dispatchEvent(event);
 
-        updateUI(totalPrice);
+        updateUIAndCalcTotalPrice(totalPrice);
       });
     }
   } catch (error) {
     throw new Error(error);
   }
 })();
-
-const discounts = {
-  primary: 0.4,
-  secondary: 0.5,
-  tertiary: 0.3,
-};
-
-const blackFridayDiscounts = {
-  primary: 0.5,
-  secondary: 0.4,
-  tertiary: 0.3,
-  quaternary: 0.63,
-  pentagonal: 0.7,
-};
 
 form.addEventListener(
   'change',
@@ -85,15 +83,18 @@ form.addEventListener(
 
 modal.addEventListener('click', onFormClick);
 
-promoInput.addEventListener('input', (e) => {
+promoInput.addEventListener('input', onPromoInputChange);
+
+function onPromoInputChange() {
+  // if promo code is no longer correct (user deleted it)
   if (promoInput.value !== PROMO.code && PROMO.inUse) {
     totalPrice = {
       ...totalPrice,
       currentTotalPrice: totalPrice.currentTotalPrice / PROMO.discount,
     };
-    PROMO.inUse = PROMO.isUsed = false;
+    PROMO.inUse = false;
 
-    updateUI(totalPrice, false);
+    updateUIAndCalcTotalPrice(totalPrice, false);
     return;
   }
   if (promoInput.value !== PROMO.code || PROMO.inUse) return;
@@ -105,14 +106,19 @@ promoInput.addEventListener('input', (e) => {
     currentTotalPrice: totalPrice.currentTotalPrice * PROMO.discount,
   };
 
-  PROMO.isUsed = true;
-  updateUI(totalPrice, false);
-});
+  updateUIAndCalcTotalPrice(totalPrice, false);
+}
 
 function onFormClick(e) {
   const closest = e.target.closest('button[type="submit"]');
+
   if (closest) onSubmitForm(e);
   else onClearBtnClick(e);
+}
+
+function onSubmitForm(e) {
+  e.preventDefault();
+  alert('Form has been submitted');
 }
 
 function onClearBtnClick(e) {
@@ -122,8 +128,10 @@ function onClearBtnClick(e) {
 
   const fieldToClear = form.elements[closest.dataset.name];
 
+  // remove unchecked course from chosen array
   chosen = chosen.filter((item) => item.name !== fieldToClear?.value);
 
+  // if fieldToClear has more than one items
   if (fieldToClear.length)
     findCheckedButtons(...fieldToClear).forEach((item) => {
       item.checked = false;
@@ -131,20 +139,22 @@ function onClearBtnClick(e) {
 
   fieldToClear.checked = false;
 
-  // Dispatch change event on form
+  // Fire change event on form
   const event = new Event('change');
   form.dispatchEvent(event);
 }
 
 function onFormChangeIsNotBlackFriday(e) {
+  // if promo input changed – do nothing
   if (e.target.name === 'promo') return;
 
+  // get the course from "database"
   const course = courses.find(({ name }) => name === e.target.value);
 
   if (!e.target.checked)
     chosen = chosen.filter((item) => item.name !== e.target.value);
   else {
-    chosen = findRemovedCourse(chosen);
+    chosen = removeUncheckCoursesFromChosen(chosen);
     chosen.push({ ...course });
   }
 
@@ -154,7 +164,7 @@ function onFormChangeIsNotBlackFriday(e) {
     const { courseName, secondCourseDiscount } =
       getCourseNameAndDiscount(chosen);
 
-    const config = chosen.reduce(
+    totalPrice = chosen.reduce(
       (acc, item) => {
         /*
           normal discount for prioritized course or
@@ -172,20 +182,17 @@ function onFormChangeIsNotBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
-          // - (acc.currentTotalPrice + itemTotalPrice) *
-          //   (PROMO.inUse ? PROMO.discount : 0),
         };
       },
       { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
-    totalPrice = config;
-    updateUI(totalPrice, true);
+    updateUIAndCalcTotalPrice(totalPrice, true);
     return;
   }
 
   if (chosen.length > 2) {
     const itemDiscount = discounts.primary;
-    const config = chosen.reduce(
+    totalPrice = chosen.reduce(
       (acc, item) => {
         const itemTotalPrice =
           item.originalPrice -
@@ -197,8 +204,6 @@ function onFormChangeIsNotBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
-          // - (acc.currentTotalPrice + itemTotalPrice) *
-          //   (PROMO.inUse ? PROMO.discount : 0),
         };
       },
       {
@@ -206,8 +211,7 @@ function onFormChangeIsNotBlackFriday(e) {
         currentTotalPrice: 0,
       }
     );
-    totalPrice = config;
-    updateUI(totalPrice, true);
+    updateUIAndCalcTotalPrice(totalPrice, true);
     return;
   }
   totalPrice = {
@@ -217,27 +221,30 @@ function onFormChangeIsNotBlackFriday(e) {
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
   };
 
-  updateUI(totalPrice, true);
+  updateUIAndCalcTotalPrice(totalPrice, true);
 }
 
 function onFormChangeIsBlackFriday(e) {
+  // if promo input changed – do nothing
   if (e.target.name === 'promo') return;
 
+  // get the course from "database"
   const course = courses.find(({ name }) => name === e.target.value);
 
   if (!e.target.checked)
     chosen = chosen.filter((item) => item.name !== e.target.value);
   else {
-    chosen = findRemovedCourse(chosen);
+    chosen = removeUncheckCoursesFromChosen(chosen);
     chosen.push({ ...course });
   }
 
   updateChosenList(chosen);
+
   if (chosen.length === 2) {
     const { courseName, firstCourseDiscount, secondCourseDiscount } =
       getCourseNameAndBlackFridayDiscount(chosen);
 
-    const config = chosen.reduce(
+    totalPrice = chosen.reduce(
       (acc, item) => {
         /*
           Black friday  discount for prioritized course or
@@ -255,20 +262,18 @@ function onFormChangeIsBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
-          // - (acc.currentTotalPrice + itemTotalPrice) *
-          //   (PROMO.inUse && !PROMO.used ? PROMO.discount : 0),
         };
       },
       { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
-    totalPrice = config;
-    updateUI(totalPrice);
+
+    updateUIAndCalcTotalPrice(totalPrice);
     return;
   }
 
   if (chosen.length > 2) {
     const itemDiscount = blackFridayDiscounts.primary;
-    const config = chosen.reduce(
+    totalPrice = chosen.reduce(
       (acc, item) => {
         const itemTotalPrice = getCourseTotalPrice(item, itemDiscount);
 
@@ -276,8 +281,6 @@ function onFormChangeIsBlackFriday(e) {
           ...acc,
           originalTotalPrice: acc.originalTotalPrice + item.originalPrice,
           currentTotalPrice: acc.currentTotalPrice + itemTotalPrice,
-          //  - (acc.currentTotalPrice + itemTotalPrice) *
-          //     (PROMO.inUse & !PROMO.isUsed ? PROMO.discount : 0),
         };
       },
       {
@@ -285,8 +288,8 @@ function onFormChangeIsBlackFriday(e) {
         currentTotalPrice: 0,
       }
     );
-    totalPrice = config;
-    updateUI(totalPrice);
+
+    updateUIAndCalcTotalPrice(totalPrice);
     return;
   }
   totalPrice = {
@@ -294,11 +297,8 @@ function onFormChangeIsBlackFriday(e) {
     currentTotalPrice:
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
-    // - (chosen[0]?.originalPrice -
-    //   chosen[0]?.originalPrice * chosen[0]?.normalDiscount) *
-    //   (PROMO.inUse & !PROMO.isUsed ? PROMO.discount : 0),
   };
-  updateUI(totalPrice);
+  updateUIAndCalcTotalPrice(totalPrice);
 }
 
 function includesArchitectureVanilla(chosen) {
@@ -325,6 +325,7 @@ function findCheckedButtons(...args) {
   return args.filter((item) => item.checked);
 }
 
+// For black friday only
 function getCourseTotalPrice(
   { name, originalPrice, blackFridayDiscount },
   itemDiscount
@@ -339,12 +340,14 @@ function getCourseTotalPrice(
 }
 
 // if radio button is unselected, removes it from chosen array
-function findRemovedCourse(chosen) {
+function removeUncheckCoursesFromChosen(chosen) {
   const allRadioButtons = modal.querySelectorAll('input[type="radio"]');
 
   const notCheckedCourses = [...allRadioButtons]
     .filter((item) => !item.checked)
     .map((item) => item.value);
+
+  console.log(notCheckedCourses);
 
   return chosen.filter((item) => !notCheckedCourses.includes(item.name));
 }
@@ -433,16 +436,15 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
   };
 }
 
-function updateUI(
+function updateUIAndCalcTotalPrice(
   { originalTotalPrice, currentTotalPrice },
   formHasChanged = false
 ) {
   currentTotalPrice =
     currentTotalPrice -
     currentTotalPrice * (PROMO.inUse && formHasChanged ? PROMO.discount : 0);
-  console.log(currentTotalPrice, PROMO.inUse);
 
-  deployPriceChangeAnimation();
+  firePriceChangeAnimation();
 
   // if no courses were selected
   if (!originalTotalPrice && (isNaN(currentTotalPrice) || !currentTotalPrice)) {
@@ -453,6 +455,7 @@ function updateUI(
   totalPriceRef.classList.remove('hidden');
   totalPriceContainer.cta.classList.add('hidden');
 
+  // update price UI
   totalPriceContainer.originalPrice.innerHTML = originalTotalPrice?.toFixed(2);
   totalPriceContainer.currentPrice.innerHTML = currentTotalPrice?.toFixed(2);
   totalPriceContainer.savings.innerHTML = (
@@ -465,14 +468,13 @@ function updateUI(
     chosen,
     isBlackFriday: IS_BLACK_FRIDAY,
     promoCode: promoInput.value,
-    promoCodeIsUsed: PROMO.isUsed,
     promoInUse: PROMO.inUse,
   };
 
   localStorage.setItem('formData', JSON.stringify(totalPrice));
 }
 
-function deployPriceChangeAnimation() {
+function firePriceChangeAnimation() {
   totalPriceContainer.originalPrice.classList.add('price-changed');
   totalPriceContainer.currentPrice.classList.add('price-changed');
   totalPriceContainer.savings.classList.add('price-changed');
@@ -530,9 +532,4 @@ function updateChosenList(chosen) {
       );
     }, '')
   );
-}
-
-function onSubmitForm(e) {
-  e.preventDefault();
-  alert('Form has been submitted');
 }
