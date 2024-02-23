@@ -154,7 +154,7 @@ function onFormChangeIsNotBlackFriday(e) {
   if (!e.target.checked)
     chosen = chosen.filter((item) => item.name !== e.target.value);
   else {
-    chosen = removeUncheckCoursesFromChosen(chosen);
+    chosen = removeUncheckedCoursesFromChosen(chosen);
     chosen.push({ ...course });
   }
 
@@ -234,7 +234,7 @@ function onFormChangeIsBlackFriday(e) {
   if (!e.target.checked)
     chosen = chosen.filter((item) => item.name !== e.target.value);
   else {
-    chosen = removeUncheckCoursesFromChosen(chosen);
+    chosen = removeUncheckedCoursesFromChosen(chosen);
     chosen.push({ ...course });
   }
 
@@ -340,7 +340,7 @@ function getCourseTotalPrice(
 }
 
 // if radio button is unselected, removes it from chosen array
-function removeUncheckCoursesFromChosen(chosen) {
+function removeUncheckedCoursesFromChosen(chosen) {
   const allRadioButtons = modal.querySelectorAll('input[type="radio"]');
 
   const notCheckedCourses = [...allRadioButtons]
@@ -512,11 +512,11 @@ function updateChosenList(chosen) {
             <img
               width="56"
               height="14"
-              src="./images/icon_${fileName}_1x.webp"
+              src="./images/icon_${fileName.toLowerCase()}_1x.webp"
               alt="Architecture icon"
               srcset="
-                ./images/icon_${fileName}_1x.webp 1x,
-                ./images/icon_${fileName}_2x.webp 2x
+                ./images/icon_${fileName.toLowerCase()}_1x.webp 1x,
+                ./images/icon_${fileName.toLowerCase()}_2x.webp 2x
               "
             />
           </div>
