@@ -175,8 +175,6 @@ function onFormChangeIsNotBlackFriday(e) {
             ? item.normalDiscount
             : secondCourseDiscount;
 
-        console.log(secondCourseDiscount);
-
         const itemTotalPrice =
           item.originalPrice - item.originalPrice * itemDiscount;
 
