@@ -296,7 +296,7 @@ function onFormChangeIsBlackFriday(e) {
     originalTotalPrice: chosen[0]?.originalPrice,
     currentTotalPrice:
       chosen[0]?.originalPrice -
-      chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
+      chosen[0]?.originalPrice * chosen[0]?.blackFridayDiscount,
   };
   updateUIAndCalcTotalPrice(totalPrice, true);
 }
@@ -330,6 +330,7 @@ function getCourseTotalPrice(
   { name, originalPrice, blackFridayDiscount },
   itemDiscount
 ) {
+  console.log(blackFridayDiscount);
   if (name === 'TeamLead')
     return originalPrice - originalPrice * blackFridayDiscounts.pentagonal;
 
