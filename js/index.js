@@ -1,6 +1,6 @@
 import courses from '../data.json' assert { type: 'json' };
 
-const IS_BLACK_FRIDAY = false;
+const IS_BLACK_FRIDAY = true;
 
 let PROMO = {
   code: 'abc',
@@ -175,6 +175,8 @@ function onFormChangeIsNotBlackFriday(e) {
             ? item.normalDiscount
             : secondCourseDiscount;
 
+        console.log(secondCourseDiscount);
+
         const itemTotalPrice =
           item.originalPrice - item.originalPrice * itemDiscount;
 
@@ -197,7 +199,7 @@ function onFormChangeIsNotBlackFriday(e) {
         const itemTotalPrice =
           item.originalPrice -
           item.originalPrice *
-            (item.name === 'ArchitectureStandart' // if course is ArchitectureStandart, it gets normal discount
+            (item.name === 'Architecture Standart' // if course is ArchitectureStandart, it gets normal discount
               ? item.normalDiscount
               : itemDiscount);
         return {
@@ -267,7 +269,7 @@ function onFormChangeIsBlackFriday(e) {
       { originalTotalPrice: 0, currentTotalPrice: 0 }
     );
 
-    updateUIAndCalcTotalPrice(totalPrice);
+    updateUIAndCalcTotalPrice(totalPrice, true);
     return;
   }
 
@@ -289,7 +291,7 @@ function onFormChangeIsBlackFriday(e) {
       }
     );
 
-    updateUIAndCalcTotalPrice(totalPrice);
+    updateUIAndCalcTotalPrice(totalPrice, true);
     return;
   }
   totalPrice = {
@@ -298,11 +300,11 @@ function onFormChangeIsBlackFriday(e) {
       chosen[0]?.originalPrice -
       chosen[0]?.originalPrice * chosen[0]?.normalDiscount,
   };
-  updateUIAndCalcTotalPrice(totalPrice);
+  updateUIAndCalcTotalPrice(totalPrice, true);
 }
 
 function includesArchitectureVanilla(chosen) {
-  return chosen.some((item) => item.name === 'ArchitectureVanilla');
+  return chosen.some((item) => item.name === 'Architecture Vanilla');
 }
 
 function includesTeamLead(chosen) {
@@ -314,7 +316,7 @@ function findFlagShip(chosen) {
 }
 
 function findUnitTest(chosen) {
-  return chosen.find((item) => item.name === 'UnitTesting');
+  return chosen.find((item) => item.name === 'Unit Testing');
 }
 
 function findAddressables(chosen) {
@@ -333,7 +335,7 @@ function getCourseTotalPrice(
   if (name === 'TeamLead')
     return originalPrice - originalPrice * blackFridayDiscounts.pentagonal;
 
-  if (name === 'ArchitectureStandart')
+  if (name === 'Architecture Standart')
     return originalPrice - originalPrice * blackFridayDiscount;
 
   return originalPrice - originalPrice * itemDiscount;
@@ -347,8 +349,6 @@ function removeUncheckedCoursesFromChosen(chosen) {
     .filter((item) => !item.checked)
     .map((item) => item.value);
 
-  console.log(notCheckedCourses);
-
   return chosen.filter((item) => !notCheckedCourses.includes(item.name));
 }
 
@@ -360,7 +360,7 @@ function getCourseNameAndDiscount(chosen) {
 
   if (
     prioritizedCourse?.isFlagship ||
-    prioritizedCourse?.name === 'UnitTesting'
+    prioritizedCourse?.name === 'Unit Testing'
   ) {
     return {
       courseName: prioritizedCourse.name,
@@ -381,7 +381,7 @@ function getCourseNameAndDiscount(chosen) {
       secondCourseDiscount: secondary,
     };
   }
-  return { courseName: '' };
+  return { courseName: '', secondCourseDiscount: primary };
 }
 
 // Returns prioritized course name and black friday discount for every course
@@ -402,7 +402,7 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
 
   if (
     (prioritizedCourse?.isFlagship ||
-      prioritizedCourse?.name === 'UnitTesting') &&
+      prioritizedCourse?.name === 'Unit Testing') &&
     findAddressables(chosen)
   ) {
     return {
@@ -413,7 +413,7 @@ function getCourseNameAndBlackFridayDiscount(chosen) {
   }
   if (
     prioritizedCourse?.isFlagship ||
-    prioritizedCourse?.name === 'UnitTesting'
+    prioritizedCourse?.name === 'Unit Testing'
   ) {
     return {
       courseName: prioritizedCourse.name,
