@@ -512,11 +512,11 @@ function updateChosenList(chosen) {
             <img
               width="56"
               height="14"
-              src="./images/icon_${fileName.toLowerCase()}_1x.webp"
+              src="./images/icon_${fileName?.toLowerCase()}_1x.webp"
               alt="Architecture icon"
               srcset="
-                ./images/icon_${fileName.toLowerCase()}_1x.webp 1x,
-                ./images/icon_${fileName.toLowerCase()}_2x.webp 2x
+                ./images/icon_${fileName?.toLowerCase()}_1x.webp 1x,
+                ./images/icon_${fileName?.toLowerCase()}_2x.webp 2x
               "
             />
           </div>
