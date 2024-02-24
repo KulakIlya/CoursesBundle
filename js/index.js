@@ -48,7 +48,10 @@ const blackFridayDiscounts = {
   try {
     const data = JSON.parse(localStorage.getItem('formData')) || {};
     const version = localStorage.getItem('version');
-    if (version !== '2.0') localStorage.clear();
+    if (version !== '3.0') {
+      localStorage.clear();
+      return;
+    }
     if (data.isBlackFriday !== IS_BLACK_FRIDAY)
       localStorage.removeItem('formData');
     else {
@@ -473,7 +476,7 @@ function updateUIAndCalcTotalPrice(
   };
 
   localStorage.setItem('formData', JSON.stringify(totalPrice));
-  localStorage.setItem('version', '2.0');
+  localStorage.setItem('version', '3.0');
 }
 
 function firePriceChangeAnimation() {
