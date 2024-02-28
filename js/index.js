@@ -1,6 +1,6 @@
 import courses from '../data.json' assert { type: 'json' };
 
-const IS_BLACK_FRIDAY = true;
+const IS_BLACK_FRIDAY = false;
 
 let PROMO = {
   code: 'abc',
